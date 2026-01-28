@@ -1,0 +1,17 @@
+schema_version = "1.0.0"
+
+id = "garment_pattern_uv_dataset"
+version = "0.1.0"
+name = "Garment Pattern UV Dataset"
+tagline = "JSON annotation tools for pattern-like UV datasets"
+maintainer = "t-ttajri"
+type = "add-on"
+
+blender_version_min = "4.0.0"
+
+license = [
+  "UNLICENSED",
+]
+
+[permissions]
+files = "Import/export annotation JSON files"

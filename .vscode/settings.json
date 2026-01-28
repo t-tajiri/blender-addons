@@ -1,0 +1,11 @@
+{
+  "blender.executables": [
+    {
+      "name": "",
+      "path": "c:\\Program Files (x86)\\Steam\\steamapps\\common\\Blender\\blender.exe",
+      "isDebug": true
+    }
+  ],
+  "blender.addon.reloadOnSave": true,
+  "blender.addon.logLevel": "debug"
+}

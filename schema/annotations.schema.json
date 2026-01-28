@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/garment-pattern-uv-dataset/annotations.schema.json",
+  "title": "Garment Pattern UV Dataset Annotation",
+  "type": "object",
+  "required": [
+    "garment_id",
+    "garment_type",
+    "design_reasoning",
+    "parts"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "garment_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "garment_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "design_reasoning": {
+      "type": "string",
+      "minLength": 1
+    },
+    "parts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/part"
+      }
+    }
+  },
+  "$defs": {
+    "part": {
+      "type": "object",
+      "required": [
+        "name",
+        "label",
+        "modeling_reasoning",
+        "uv_reasoning",
+        "seams"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "modeling_reasoning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "uv_reasoning": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seams": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/seam"
+          }
+        }
+      }
+    },
+    "seam": {
+      "type": "object",
+      "required": [
+        "name",
+        "seam_reasoning"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "seam_reasoning": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -86,25 +86,25 @@ def _validate_data_dict(data):
     design_reasoning = data.get("design_reasoning")
 
     if not _nonempty(garment_id):
-        errors.append("garment_id は必須です。")
+        errors.append("Garment ID は必須です。")
     if not _nonempty(garment_type):
-        errors.append("garment_type は必須です。")
+        errors.append("Garment Type は必須です。")
     elif garment_type not in GARMENT_TYPE_OPTIONS:
         errors.append(
-            "garment_type は次のいずれかでなければなりません: " + ", ".join(GARMENT_TYPE_OPTIONS) + "。"
+            "Garment Type は次のいずれかでなければなりません: " + ", ".join(GARMENT_TYPE_OPTIONS) + "。"
         )
     if not _nonempty(design_reasoning):
-        errors.append("design_reasoning は必須です。")
+        errors.append("シルエットの設計理由 は必須です。")
 
     parts = data.get("parts")
     if not isinstance(parts, list) or len(parts) < 1:
-        errors.append("parts は 1 つ以上の要素を持つ配列である必要があります。")
+        errors.append("Parts は 1 つ以上の要素を持つ配列である必要があります。")
         return errors
 
     seen_part_names = set()
     for index, part in enumerate(parts):
         if not isinstance(part, dict):
-            errors.append(f"parts[{index}] はオブジェクトである必要があります。")
+            errors.append(f"Parts[{index}] はオブジェクトである必要があります。")
             continue
 
         name = part.get("name")
@@ -114,27 +114,26 @@ def _validate_data_dict(data):
         seams = part.get("seams")
 
         if not _nonempty(name):
-            errors.append(f"parts[{index}].name は必須です。")
+            errors.append(f"Name は必須です。")
         elif name in seen_part_names:
             errors.append(f"部位名が重複しています: {name}。")
         else:
             seen_part_names.add(name)
 
         if not _nonempty(label):
-            errors.append(f"parts[{index}].label は必須です。")
+            errors.append("Label は必須です。")
         if not _nonempty(modeling_reasoning):
-            errors.append(f"parts[{index}].modeling_reasoning は必須です。")
+            errors.append("形状にした理由 は必須です。")
         if not _nonempty(uv_reasoning):
-            errors.append(f"parts[{index}].uv_reasoning は必須です。")
-
+            errors.append("UVの配置理由 は必須です。")
         if not isinstance(seams, list) or len(seams) < 1:
-            errors.append(f"parts[{index}].seams は 1 つ以上の要素を持つ配列である必要があります。")
+            errors.append("Seams は 1 つ以上の要素を持つ配列である必要があります。")
             continue
 
         for seam_index, seam in enumerate(seams):
             if not isinstance(seam, dict):
                 errors.append(
-                    f"parts[{index}].seams[{seam_index}] はオブジェクトである必要があります。"
+                    f"Seams[{seam_index}] はオブジェクトである必要があります。"
                 )
                 continue
 
@@ -142,13 +141,9 @@ def _validate_data_dict(data):
             seam_reasoning = seam.get("seam_reasoning")
 
             if not _nonempty(seam_name):
-                errors.append(
-                    f"parts[{index}].seams[{seam_index}].name は必須です。"
-                )
+                errors.append("Name は必須です。")
             if not _nonempty(seam_reasoning):
-                errors.append(
-                    f"parts[{index}].seams[{seam_index}].seam_reasoning は必須です。"
-                )
+                errors.append("Seam Reasoning は必須です。")
 
     return errors
 

@@ -74,3 +74,5 @@ class GARMENT_UV_PT_sidebar(Panel):
 
         layout.separator()
         layout.operator("garment_uv.export_json", icon="EXPORT")
+        if props.last_error:
+            layout.label(text=props.last_error, icon="ERROR")

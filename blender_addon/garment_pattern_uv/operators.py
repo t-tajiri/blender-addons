@@ -17,10 +17,16 @@ class GARMENT_UV_OT_export_json(Operator):
 
     def execute(self, context):
         props = context.scene.garment_uv
+        if hasattr(props, "last_error"):
+            props.last_error = ""
+
         data = _props_to_dict_filtered(props, context.object)
         errors = _validate_data_dict(data)
         if errors:
-            self.report({"ERROR"}, errors[0])
+            msg = errors[0]
+            if hasattr(props, "last_error"):
+                props.last_error = msg
+            self.report({"ERROR"}, msg)
             return {"CANCELLED"}
 
         path = bpy.path.abspath(self.filepath)
@@ -33,7 +39,10 @@ class GARMENT_UV_OT_export_json(Operator):
                 json.dump(data, handle, ensure_ascii=False, indent=2)
                 handle.write("\n")
         except OSError as exc:
-            self.report({"ERROR"}, f"Failed to write JSON: {exc}")
+            msg = f"Failed to write JSON: {exc}"
+            if hasattr(props, "last_error"):
+                props.last_error = msg
+            self.report({"ERROR"}, msg)
             return {"CANCELLED"}
 
         self.report({"INFO"}, f"Exported JSON to {path}")

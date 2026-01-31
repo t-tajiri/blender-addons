@@ -69,6 +69,7 @@ class GarmentAnnotationProperties(PropertyGroup):
     parts: CollectionProperty(type=GarmentPartItem)
     active_part_index: IntProperty(default=-1)
     last_sync_signature: StringProperty(name="Last Sync Signature", default="")
+    last_error: StringProperty(name="エラー")
 
 
 def register():

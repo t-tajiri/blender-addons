@@ -1,0 +1,68 @@
+name: Build & Deploy Blender Extensions
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      BLENDER_VERSION: "4.2.17"
+      REPO_DIR: "site"          # Pagesへ出すディレクトリ
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare repo directory
+        run: |
+          mkdir -p "${REPO_DIR}"
+          cp -v packages/*.zip "${REPO_DIR}/"
+
+      - name: Download Blender
+        run: |
+          set -eux
+          URL="https://download.blender.org/release/Blender${BLENDER_VERSION%.*}/blender-${BLENDER_VERSION}-linux-x64.tar.xz"
+          curl -L "$URL" -o blender.tar.xz
+          tar -xf blender.tar.xz
+          BLENDER_DIR="$(find . -maxdepth 1 -type d -name 'blender-*' | head -n 1)"
+          echo "BLENDER_BIN=${BLENDER_DIR}/blender" >> $GITHUB_ENV
+
+      - name: Cache Blender
+        uses: actions/cache@v4
+        with:
+          path: blender-*
+          key: blender-${{ env.BLENDER_VERSION }}
+
+      - name: Generate index.json & optional html
+        run: |
+          set -eux
+          "${BLENDER_BIN}" --command extension server-generate --repo-dir "${REPO_DIR}" --html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ env.REPO_DIR }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

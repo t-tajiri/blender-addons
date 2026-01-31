@@ -26,6 +26,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Zip packages
+        run: |
+          set -eux
+          find packages -maxdepth 1 -type f -name '*.zip' -delete
+          for dir in packages/*/; do
+            [ -d "$dir" ] || continue
+            base="$(basename "$dir")"
+            (cd packages && zip -r "${base}.zip" "${base}")
+          done
+
       - name: Prepare repo directory
         run: |
           mkdir -p "${REPO_DIR}"

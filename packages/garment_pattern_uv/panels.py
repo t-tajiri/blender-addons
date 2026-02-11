@@ -1,78 +1,110 @@
 import bpy
 from bpy.types import Panel, UIList
 
-
 class GARMENT_UV_UL_part_list(UIList):
-    # パーツ一覧の UI 表示。
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+    """パーツ一覧の UIList。"""
+
+    def draw_item(
+        self, _context, layout, _data, item, _icon, _active_data, _active_propname
+    ):
         layout.prop(item, "name", text="", emboss=False)
 
 
 class GARMENT_UV_UL_seam_list(UIList):
-    # シーム一覧の UI 表示。
-    def draw_item(self, context, layout, data, item, icon, active_data, active_propname):
+    """シーム一覧の UIList。"""
+
+    def draw_item(
+        self, _context, layout, data, item, _icon, _active_data, _active_propname
+    ):
         row = layout.row(align=True)
         row.prop(item, "is_selected", text="")
-        row.prop(item, "name", text="", emboss=False)
+        op = row.operator(
+            "garment_uv.toggle_seam_selection",
+            text=item.name,
+            emboss=False,
+            depress=item.is_selected,
+        )
+        op.part_name = getattr(data, "name", "")
+        op.seam_name = item.name
 
 
 class GARMENT_UV_PT_sidebar(Panel):
-    # 3Dビューのサイドバーに表示する UI パネル。
+    """3Dビューのサイドバーに表示する UI パネル。"""
+
     bl_label = "Garment UV"
     bl_idname = "GARMENT_UV_PT_sidebar"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
     bl_category = "Garment UV"
 
+    def _foldout(self, box, props, flag_name: str, label: str) -> bool:
+        row = box.row()
+        icon = "TRIA_DOWN" if getattr(props, flag_name) else "TRIA_RIGHT"
+        row.prop(props, flag_name, text=label, icon=icon, emboss=False)
+        return getattr(props, flag_name)
+
     def draw(self, context):
         layout = self.layout
         props = context.scene.garment_uv
 
-        # 1着分の基本情報入力欄
-        layout.label(text="Annotation")
-        layout.prop(props, "garment_id")
-        layout.prop(props, "garment_type")
-        layout.prop(props, "design_reasoning")
-        layout.label(text="この下はパーツ一覧です。追加・削除と詳細入力を行います。")
+        box = layout.box()
+        if self._foldout(box, props, "show_annotation", "アノテーション"):
+            col = box.column(align=True)
+            col.prop(props, "garment_id")
+            col.prop(props, "garment_type")
+            col.prop(props, "design_reasoning", text="形状理由")
 
         box = layout.box()
-        row = box.row()
-        row.template_list(
-            "GARMENT_UV_UL_part_list",
-            "",
-            props,
-            "parts",
-            props,
-            "active_part_index",
-            rows=4,
-        )
-
-        if 0 <= props.active_part_index < len(props.parts):
-            part = props.parts[props.active_part_index]
-            # シーム選択
-            box.template_list(
-                "GARMENT_UV_UL_seam_list",
+        if self._foldout(box, props, "show_parts", "パーツ"):
+            col = box.column()
+            col.label(text="パーツ一覧")
+            col.template_list(
+                "GARMENT_UV_UL_part_list",
                 "",
-                part,
-                "seams",
-                part,
-                "active_seam_index",
-                rows=4,
+                props,
+                "parts",
+                props,
+                "active_part_index",
+                rows=6,
             )
 
-            # 入力欄
-            box.prop(part, "label")
-            box.prop(part, "modeling_reasoning")
-            box.prop(part, "uv_reasoning")
+            if 0 <= props.active_part_index < len(props.parts):
+                part = props.parts[props.active_part_index]
+                detail_box = col.box()
+                detail_box.label(text="選択中パーツ詳細")
 
+                detail_box.prop(part, "label")
+                detail_box.prop(part, "uv_reasoning", text="形状理由")
+                detail_box.prop(part, "modeling_reasoning", text="UV理由")
+            else:
+                col.label(text="パーツを追加して選択してください。")
 
-            # シーム
-            seam = part.seams[part.active_seam_index]
-            box.prop(seam, "seam_reasoning")
-        else:
-            box.label(text="Add a part to edit details.")
+        box = layout.box()
+        if self._foldout(box, props, "show_seams", "シーム"):
+            if 0 <= props.active_part_index < len(props.parts):
+                part = props.parts[props.active_part_index]
+                seam_col = box.column()
+                seam_col.label(text="シーム一覧")
+                seam_col.template_list(
+                    "GARMENT_UV_UL_seam_list",
+                    "",
+                    part,
+                    "seams",
+                    part,
+                    "active_seam_index",
+                    rows=6,
+                )
 
-        layout.separator()
-        layout.operator("garment_uv.export_json", icon="EXPORT")
+                if part.seams and 0 <= part.active_seam_index < len(part.seams):
+                    seam = part.seams[part.active_seam_index]
+                    seam_col.prop(seam, "seam_reasoning", text="シーム理由")
+                else:
+                    seam_col.label(text="シームを選択してください。")
+            else:
+                box.label(text="パーツを選択するとシームを編集できます。")
+
+        export_box = layout.box()
+        export_box.label(text="エクスポート")
+        export_box.operator("garment_uv.export_json", icon="EXPORT")
         if props.last_error:
-            layout.label(text=props.last_error, icon="ERROR")
+            export_box.label(text=props.last_error, icon="ERROR")

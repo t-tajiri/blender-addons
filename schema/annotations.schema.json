@@ -3,29 +3,19 @@
   "$id": "https://example.com/garment-pattern-uv-dataset/annotations.schema.json",
   "title": "Garment Pattern UV Dataset Annotation",
   "type": "object",
-  "required": [
-    "garment_id",
-    "garment_type",
-    "design_reasoning",
-    "parts"
-  ],
   "additionalProperties": false,
   "properties": {
     "garment_id": {
-      "type": "string",
-      "minLength": 1
+      "type": "string"
     },
     "garment_type": {
-      "type": "string",
-      "minLength": 1
+      "type": "string"
     },
     "design_reasoning": {
-      "type": "string",
-      "minLength": 1
+      "type": "string"
     },
     "parts": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "$ref": "#/$defs/part"
       }
@@ -34,34 +24,22 @@
   "$defs": {
     "part": {
       "type": "object",
-      "required": [
-        "name",
-        "label",
-        "modeling_reasoning",
-        "uv_reasoning",
-        "seams"
-      ],
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "label": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "modeling_reasoning": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "uv_reasoning": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "seams": {
           "type": "array",
-          "minItems": 1,
           "items": {
             "$ref": "#/$defs/seam"
           }
@@ -70,19 +48,13 @@
     },
     "seam": {
       "type": "object",
-      "required": [
-        "name",
-        "seam_reasoning"
-      ],
       "additionalProperties": false,
       "properties": {
         "name": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "seam_reasoning": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         }
       }
     }

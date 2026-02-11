@@ -16,9 +16,13 @@ class GARMENT_UV_UL_seam_list(UIList):
     def draw_item(
         self, _context, layout, data, item, _icon, _active_data, _active_propname
     ):
-        row = layout.row(align=True)
+        row = layout.row()
+        row.alignment = "LEFT"
         row.prop(item, "is_selected", text="")
-        op = row.operator(
+
+        name_row = row.row()
+        name_row.alignment = "LEFT"
+        op = name_row.operator(
             "garment_uv.toggle_seam_selection",
             text=item.name,
             emboss=False,
